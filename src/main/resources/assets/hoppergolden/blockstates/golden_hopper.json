@@ -1,9 +1,10 @@
 {
     "variants": {
-        "facing=down":  { "model": "hoppergolden:block/golden_hopper"                },
-        "facing=north": { "model": "hoppergolden:block/golden_hopper_side"           },
-        "facing=south": { "model": "hoppergolden:block/golden_hopper_side", "y": 180 },
-        "facing=west":  { "model": "hoppergolden:block/golden_hopper_side", "y": 270 },
-        "facing=east":  { "model": "hoppergolden:block/golden_hopper_side", "y": 90  }
+        "facing=up":    { "model": "hoppergolden:golden_hopper"                },
+        "facing=down":  { "model": "hoppergolden:golden_hopper"                },
+        "facing=north": { "model": "hoppergolden:golden_hopper_side"           },
+        "facing=south": { "model": "hoppergolden:golden_hopper_side", "y": 180 },
+        "facing=west":  { "model": "hoppergolden:golden_hopper_side", "y": 270 },
+        "facing=east":  { "model": "hoppergolden:golden_hopper_side", "y": 90  }
     }
 }
