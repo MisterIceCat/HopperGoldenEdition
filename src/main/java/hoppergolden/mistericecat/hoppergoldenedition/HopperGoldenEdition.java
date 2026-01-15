@@ -1,6 +1,7 @@
 package hoppergolden.mistericecat.hoppergoldenedition;
 
 import hoppergolden.mistericecat.hoppergolden.Tags;
+import hoppergolden.mistericecat.hoppergoldenedition.init.RegistrationHandler;
 import hoppergolden.mistericecat.hoppergoldenedition.tileentity.TileEntityGoldenHopper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -20,6 +21,7 @@ public class HopperGoldenEdition
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        RegistrationHandler.init();
         GameRegistry.registerTileEntity(
                 TileEntityGoldenHopper.class,
                 new ResourceLocation(MOD_ID, "golden_hopper")
