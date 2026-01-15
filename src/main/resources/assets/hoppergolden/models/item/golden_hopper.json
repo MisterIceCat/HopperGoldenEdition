@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "hoppergolden:item/golden_hopper_item"
+    }
+}
