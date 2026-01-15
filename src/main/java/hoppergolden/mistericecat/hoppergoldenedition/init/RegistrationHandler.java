@@ -98,6 +98,6 @@ public class RegistrationHandler {
     }
 
     public static void init() {
-        HopperGoldenBlock.register();
+        ModBlocks.register();
     }
 }

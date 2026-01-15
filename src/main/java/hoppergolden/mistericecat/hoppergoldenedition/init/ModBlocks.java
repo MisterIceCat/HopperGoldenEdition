@@ -4,7 +4,7 @@ import hoppergolden.mistericecat.hoppergoldenedition.blocks.BlockGoldenHopper;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 
-public class HopperGoldenBlock
+public class ModBlocks
 {
 
     public static final Block GOLDEN_HOPPER;
