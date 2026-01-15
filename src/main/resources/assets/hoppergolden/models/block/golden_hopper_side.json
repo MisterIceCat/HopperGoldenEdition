@@ -1,9 +1,9 @@
 {
     "parent": "block/hopper_side",
     "textures": {
-        "particle": "hoppergolden:block/goldenhopper_outside",
-        "top": "hoppergolden:block/goldenhopper_top",
-        "side": "hoppergolden:block/goldenhopper_outside",
-        "inside": "hoppergolden:block/goldenhopper_inside"
+        "particle": "hoppergolden:block/golden_hopper_outside",
+        "top": "hoppergolden:block/golden_hopper_top",
+        "side": "hoppergolden:block/golden_hopper_outside",
+        "inside": "hoppergolden:block/golden_hopper_inside"
     }
 }
