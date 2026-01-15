@@ -1,0 +1,9 @@
+{
+    "variants": {
+        "facing=down":  { "model": "hoppergoldenedition:block/golden_hopper"                },
+        "facing=north": { "model": "hoppergoldenedition:block/golden_hopper_side"           },
+        "facing=south": { "model": "hoppergoldenedition:block/golden_hopper_side", "y": 180 },
+        "facing=west":  { "model": "hoppergoldenedition:block/golden_hopper_side", "y": 270 },
+        "facing=east":  { "model": "hoppergoldenedition:block/golden_hopper_side", "y": 90  }
+    }
+}
