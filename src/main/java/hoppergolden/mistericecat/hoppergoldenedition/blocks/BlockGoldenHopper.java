@@ -54,4 +54,20 @@ public class BlockGoldenHopper extends BlockContainer {
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, FACING);
     }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(FACING, getFacing(meta));
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        int i = 0;
+        i = i | state.getValue(FACING).getIndex();
+        return i;
+    }
+
+    public static EnumFacing getFacing(int meta) {
+        return EnumFacing.byIndex(meta & 7);
+    }
 }
