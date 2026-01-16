@@ -12,6 +12,7 @@ public class BlockGoldenHopper extends BlockHopper {
     public BlockGoldenHopper() {
         super();
         setRegistryName("golden_hopper");
+        setTranslationKey("golden_hopper");
     }
 
     @Nullable
