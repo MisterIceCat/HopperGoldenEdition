@@ -1,6 +1,6 @@
 package mod.mistericecat.hoppergoldenedition;
 
-import hoppergolden.mistericecat.hoppergolden.Tags;
+import mod.mistericecat.hoppergolden.Tags;
 import mod.mistericecat.hoppergoldenedition.init.RegistrationHandler;
 import mod.mistericecat.hoppergoldenedition.tileentity.TileEntityGoldenHopper;
 import net.minecraft.util.ResourceLocation;
