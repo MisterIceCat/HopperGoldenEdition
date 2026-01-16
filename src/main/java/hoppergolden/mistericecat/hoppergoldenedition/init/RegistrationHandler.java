@@ -18,6 +18,10 @@ import java.util.List;
 
 public class RegistrationHandler {
 
+    public static void init() {
+        ModBlocks.register();
+    }
+
     @Mod.EventBusSubscriber(modid = HopperGoldenEdition.MOD_ID)
     public static class Blocks {
         private static final List<Block> BLOCKS = new LinkedList<>();
@@ -95,9 +99,5 @@ public class RegistrationHandler {
         public static void register(RegistryEvent.Register<SoundEvent> event) {
             SOUNDS.forEach(sound -> event.getRegistry().register(sound));
         }
-    }
-
-    public static void init() {
-        ModBlocks.register();
     }
 }

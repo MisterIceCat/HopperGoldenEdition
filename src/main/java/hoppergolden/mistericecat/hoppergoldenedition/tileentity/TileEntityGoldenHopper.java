@@ -9,9 +9,8 @@ import net.minecraft.util.NonNullList;
 
 public class TileEntityGoldenHopper extends TileEntity implements IInventory {
 
-    private NonNullList<ItemStack> inventory = NonNullList.withSize(7, ItemStack.EMPTY);
-
     private final String customName = "container.golden_hopper";
+    private NonNullList<ItemStack> inventory = NonNullList.withSize(7, ItemStack.EMPTY);
 
     public boolean canItemPassFilter(ItemStack stack) {
         ItemStack filter = inventory.get(6);
@@ -110,10 +109,12 @@ public class TileEntityGoldenHopper extends TileEntity implements IInventory {
     }
 
     @Override
-    public void openInventory(net.minecraft.entity.player.EntityPlayer player) {}
+    public void openInventory(net.minecraft.entity.player.EntityPlayer player) {
+    }
 
     @Override
-    public void closeInventory(net.minecraft.entity.player.EntityPlayer player) {}
+    public void closeInventory(net.minecraft.entity.player.EntityPlayer player) {
+    }
 
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
@@ -122,13 +123,18 @@ public class TileEntityGoldenHopper extends TileEntity implements IInventory {
     }
 
     @Override
-    public int getField(int id) { return 0; }
+    public int getField(int id) {
+        return 0;
+    }
 
     @Override
-    public void setField(int id, int value) {}
+    public void setField(int id, int value) {
+    }
 
     @Override
-    public int getFieldCount() { return 0; }
+    public int getFieldCount() {
+        return 0;
+    }
 
     @Override
     public void clear() {
