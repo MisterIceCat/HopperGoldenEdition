@@ -1,23 +1,44 @@
 {
   "variants": {
-    "facing=up": {
+    "enabled=false,facing=up": {
       "model": "hoppergolden:golden_hopper"
     },
-    "facing=down": {
+    "enabled=false,facing=down": {
       "model": "hoppergolden:golden_hopper"
     },
-    "facing=north": {
+    "enabled=false,facing=north": {
       "model": "hoppergolden:golden_hopper_side"
     },
-    "facing=south": {
+    "enabled=false,facing=south": {
       "model": "hoppergolden:golden_hopper_side",
       "y": 180
     },
-    "facing=west": {
+    "enabled=false,facing=west": {
       "model": "hoppergolden:golden_hopper_side",
       "y": 270
     },
-    "facing=east": {
+    "enabled=false,facing=east": {
+      "model": "hoppergolden:golden_hopper_side",
+      "y": 90
+    },
+    "enabled=true,facing=up": {
+      "model": "hoppergolden:golden_hopper"
+    },
+    "enabled=true,facing=down": {
+      "model": "hoppergolden:golden_hopper"
+    },
+    "enabled=true,facing=north": {
+      "model": "hoppergolden:golden_hopper_side"
+    },
+    "enabled=true,facing=south": {
+      "model": "hoppergolden:golden_hopper_side",
+      "y": 180
+    },
+    "enabled=true,facing=west": {
+      "model": "hoppergolden:golden_hopper_side",
+      "y": 270
+    },
+    "enabled=true,facing=east": {
       "model": "hoppergolden:golden_hopper_side",
       "y": 90
     }
