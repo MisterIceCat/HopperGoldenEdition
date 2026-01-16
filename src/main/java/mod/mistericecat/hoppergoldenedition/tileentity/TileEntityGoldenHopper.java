@@ -1,35 +1,23 @@
 package mod.mistericecat.hoppergoldenedition.tileentity;
 
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityHopper;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 
-public class TileEntityGoldenHopper extends TileEntity implements IInventory {
+public class TileEntityGoldenHopper extends TileEntityHopper implements ISidedInventory {
 
-    private final String customName = "container.golden_hopper";
-    private NonNullList<ItemStack> inventory = NonNullList.withSize(7, ItemStack.EMPTY);
+    public static final int FILTER_SLOT = 5;
 
-    public boolean canItemPassFilter(ItemStack stack) {
-        ItemStack filter = inventory.get(6);
+    private NonNullList<ItemStack> inventory = NonNullList.withSize(6, ItemStack.EMPTY);
+
+    private boolean matchesFilter(ItemStack stack) {
+        ItemStack filter = inventory.get(FILTER_SLOT);
         if (filter.isEmpty()) return true;
         return ItemStack.areItemsEqual(stack, filter);
-    }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        super.writeToNBT(compound);
-        ItemStackHelper.saveAllItems(compound, inventory);
-        return compound;
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound compound) {
-        super.readFromNBT(compound);
-        inventory = NonNullList.withSize(7, ItemStack.EMPTY);
-        ItemStackHelper.loadAllItems(compound, inventory);
     }
 
     @Override
@@ -58,14 +46,12 @@ public class TileEntityGoldenHopper extends TileEntity implements IInventory {
             if (stack.getCount() <= count) {
                 result = stack;
                 inventory.set(index, ItemStack.EMPTY);
-                markDirty();
-                return result;
             } else {
                 result = stack.splitStack(count);
                 if (stack.getCount() == 0) inventory.set(index, ItemStack.EMPTY);
-                markDirty();
-                return result;
             }
+            markDirty();
+            return result;
         }
         return ItemStack.EMPTY;
     }
@@ -74,6 +60,7 @@ public class TileEntityGoldenHopper extends TileEntity implements IInventory {
     public ItemStack removeStackFromSlot(int index) {
         ItemStack stack = inventory.get(index);
         inventory.set(index, ItemStack.EMPTY);
+        markDirty();
         return stack;
     }
 
@@ -84,60 +71,38 @@ public class TileEntityGoldenHopper extends TileEntity implements IInventory {
     }
 
     @Override
-    public String getName() {
-        return customName;
-    }
-
-    @Override
-    public boolean hasCustomName() {
-        return true;
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
-    @Override
-    public void markDirty() {
-        super.markDirty();
-    }
-
-    @Override
-    public boolean isUsableByPlayer(net.minecraft.entity.player.EntityPlayer player) {
-        return world.getTileEntity(pos) == this && player.getDistanceSq(pos) <= 64.0D;
-    }
-
-    @Override
-    public void openInventory(net.minecraft.entity.player.EntityPlayer player) {
-    }
-
-    @Override
-    public void closeInventory(net.minecraft.entity.player.EntityPlayer player) {
-    }
-
-    @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
-        if (index == 6) return true;
-        return canItemPassFilter(stack);
+        if (index == FILTER_SLOT) return true;
+        return matchesFilter(stack);
     }
 
     @Override
-    public int getField(int id) {
-        return 0;
+    public int[] getSlotsForFace(EnumFacing side) {
+        return new int[] {0, 1, 2, 3, 4};
     }
 
     @Override
-    public void setField(int id, int value) {
+    public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction) {
+        if (index == FILTER_SLOT) return false;
+        return matchesFilter(stack);
     }
 
     @Override
-    public int getFieldCount() {
-        return 0;
+    public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
+        return index != FILTER_SLOT;
     }
 
     @Override
-    public void clear() {
-        inventory.clear();
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+        super.writeToNBT(compound);
+        ItemStackHelper.saveAllItems(compound, inventory);
+        return compound;
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound compound) {
+        super.readFromNBT(compound);
+        inventory = NonNullList.withSize(6, ItemStack.EMPTY);
+        ItemStackHelper.loadAllItems(compound, inventory);
     }
 }
