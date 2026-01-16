@@ -1,6 +1,6 @@
-package hoppergolden.mistericecat.hoppergoldenedition.blocks;
+package mod.mistericecat.hoppergoldenedition.blocks;
 
-import hoppergolden.mistericecat.hoppergoldenedition.tileentity.TileEntityGoldenHopper;
+import mod.mistericecat.hoppergoldenedition.tileentity.TileEntityGoldenHopper;
 import net.minecraft.block.BlockHopper;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;

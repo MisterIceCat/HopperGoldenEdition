@@ -1,4 +1,4 @@
-package hoppergolden.mistericecat.hoppergoldenedition.tileentity;
+package mod.mistericecat.hoppergoldenedition.tileentity;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;

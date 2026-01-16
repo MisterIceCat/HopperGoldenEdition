@@ -1,8 +1,8 @@
-package hoppergolden.mistericecat.hoppergoldenedition;
+package mod.mistericecat.hoppergoldenedition;
 
 import hoppergolden.mistericecat.hoppergolden.Tags;
-import hoppergolden.mistericecat.hoppergoldenedition.init.RegistrationHandler;
-import hoppergolden.mistericecat.hoppergoldenedition.tileentity.TileEntityGoldenHopper;
+import mod.mistericecat.hoppergoldenedition.init.RegistrationHandler;
+import mod.mistericecat.hoppergoldenedition.tileentity.TileEntityGoldenHopper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
