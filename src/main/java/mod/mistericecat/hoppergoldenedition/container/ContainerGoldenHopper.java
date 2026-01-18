@@ -13,10 +13,10 @@ public class ContainerGoldenHopper extends Container {
     public ContainerGoldenHopper(InventoryPlayer playerInv, IInventory hopperInv) {
         this.hopperInv = hopperInv;
 
-        this.addSlotToContainer(new Slot(hopperInv, TileEntityGoldenHopper.FILTER_SLOT, 8, 20));
+        this.addSlotToContainer(new Slot(hopperInv, TileEntityGoldenHopper.FILTER_SLOT, 26, 20));
 
         for (int i = 0; i < 5; i++) {
-            this.addSlotToContainer(new Slot(hopperInv, i, 26 + i * 18, 20));
+            this.addSlotToContainer(new Slot(hopperInv, i, 62 + i * 18, 20));
         }
 
         for (int row = 0; row < 3; row++) {
