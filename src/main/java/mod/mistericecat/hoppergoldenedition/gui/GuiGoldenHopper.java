@@ -20,8 +20,8 @@ public class GuiGoldenHopper extends GuiContainer {
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        super.drawDefaultBackground();
         this.mc.getTextureManager().bindTexture(GUI_TEXTURE);
-
         drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
     }
 }
