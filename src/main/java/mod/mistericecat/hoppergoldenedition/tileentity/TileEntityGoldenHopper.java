@@ -8,7 +8,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityLockable;
+import net.minecraft.tileentity.TileEntityLockableLoot;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
@@ -18,7 +18,7 @@ import java.util.List;
 
 import mod.mistericecat.hoppergoldenedition.container.ContainerGoldenHopper;
 
-public class TileEntityGoldenHopper extends TileEntityLockable
+public class TileEntityGoldenHopper extends TileEntityLockableLoot
         implements ISidedInventory, ITickable {
 
     public static final int FILTER_SLOT = 5;
@@ -30,20 +30,13 @@ public class TileEntityGoldenHopper extends TileEntityLockable
     @Override
     public void update() {
         if (!world.isRemote) {
-            if (transferCooldown > 0) {
-                transferCooldown--;
-            }
+            if (transferCooldown > 0) transferCooldown--;
 
             if (transferCooldown <= 0) {
                 boolean moved = false;
 
-                if (!isEmpty()) {
-                    moved = pushItemsDown();
-                }
-
-                if (!isFull()) {
-                    moved |= pullItems();
-                }
+                if (!isEmpty()) moved = pushItemsDown();
+                if (!isFull()) moved |= pullItems();
 
                 if (moved) {
                     transferCooldown = 8;
@@ -55,8 +48,7 @@ public class TileEntityGoldenHopper extends TileEntityLockable
 
     private boolean matchesFilter(ItemStack stack) {
         ItemStack filter = inventory.get(FILTER_SLOT);
-        if (filter.isEmpty()) return true;
-        return ItemStack.areItemsEqual(filter, stack);
+        return filter.isEmpty() || ItemStack.areItemsEqual(filter, stack);
     }
 
     private boolean pushItemsDown() {
@@ -67,17 +59,18 @@ public class TileEntityGoldenHopper extends TileEntityLockable
 
         for (int i = 0; i < 5; i++) {
             ItemStack stack = inventory.get(i);
-            if (!stack.isEmpty()) {
-                ItemStack one = stack.splitStack(1);
+            if (stack.isEmpty()) continue;
 
-                if (insertIntoInventory(target, one)) {
-                    if (stack.isEmpty()) {
-                        inventory.set(i, ItemStack.EMPTY);
-                    }
-                    return true;
+            ItemStack toMove = stack.copy();
+            toMove.setCount(1);
+
+            if (insertIntoInventory(target, toMove)) {
+                stack.shrink(1);
+                if (stack.getCount() <= 0) {
+                    inventory.set(i, ItemStack.EMPTY);
                 }
-
-                stack.grow(1);
+                target.markDirty();
+                return true;
             }
         }
         return false;
@@ -98,9 +91,12 @@ public class TileEntityGoldenHopper extends TileEntityLockable
             ItemStack stack = entity.getItem();
             if (!matchesFilter(stack)) continue;
 
-            ItemStack copy = stack.copy();
-            if (insertIntoInventory(this, copy)) {
-                entity.setDead();
+            ItemStack toMove = stack.copy();
+            toMove.setCount(1);
+
+            if (insertIntoInventory(this, toMove)) {
+                stack.shrink(1);
+                if (stack.getCount() <= 0) entity.setDead();
                 return true;
             }
         }
@@ -110,22 +106,25 @@ public class TileEntityGoldenHopper extends TileEntityLockable
     private boolean pullFromInventory(IInventory inv) {
         for (int i = 0; i < inv.getSizeInventory(); i++) {
             ItemStack stack = inv.getStackInSlot(i);
-            if (!stack.isEmpty() && matchesFilter(stack)) {
-                ItemStack one = stack.splitStack(1);
+            if (stack.isEmpty() || !matchesFilter(stack)) continue;
 
-                if (insertIntoInventory(this, one)) {
-                    inv.markDirty();
-                    return true;
+            ItemStack toMove = stack.copy();
+            toMove.setCount(1);
+
+            if (insertIntoInventory(this, toMove)) {
+                stack.shrink(1);
+                if (stack.getCount() <= 0) {
+                    inv.setInventorySlotContents(i, ItemStack.EMPTY);
                 }
-
-                stack.grow(1);
+                inv.markDirty();
+                return true;
             }
         }
         return false;
     }
 
     private boolean insertIntoInventory(IInventory inv, ItemStack stack) {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < inv.getSizeInventory(); i++) {
             ItemStack slot = inv.getStackInSlot(i);
 
             if (slot.isEmpty()) {
@@ -134,6 +133,7 @@ public class TileEntityGoldenHopper extends TileEntityLockable
             }
 
             if (ItemStack.areItemsEqual(slot, stack)
+                    && ItemStack.areItemStackTagsEqual(slot, stack)
                     && slot.getCount() < slot.getMaxStackSize()) {
                 slot.grow(1);
                 return true;
@@ -175,6 +175,23 @@ public class TileEntityGoldenHopper extends TileEntityLockable
     }
 
     @Override
+    public void clear() {
+        for (int i = 0; i < inventory.size(); i++) {
+            inventory.set(i, ItemStack.EMPTY);
+        }
+    }
+
+    @Override
+    protected NonNullList<ItemStack> getItems() {
+        return inventory;
+    }
+
+    @Override
+    public boolean isItemValidForSlot(int index, ItemStack stack) {
+        return index < 5 && matchesFilter(stack);
+    }
+
+    @Override
     public int[] getSlotsForFace(EnumFacing side) {
         return STORAGE_SLOTS;
     }
@@ -187,6 +204,20 @@ public class TileEntityGoldenHopper extends TileEntityLockable
     @Override
     public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
         return index < 5;
+    }
+
+    @Override
+    public int getField(int id) {
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+    }
+
+    @Override
+    public int getFieldCount() {
+        return 0;
     }
 
     @Override
