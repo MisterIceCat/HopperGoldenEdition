@@ -60,6 +60,9 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot
         for (int i = 0; i < 5; i++) {
             ItemStack stack = inventory.get(i);
             if (stack.isEmpty()) continue;
+            
+            // Only push items that match the filter
+            if (!matchesFilter(stack)) continue;
 
             ItemStack toMove = stack.copy();
             toMove.setCount(1);
@@ -188,7 +191,8 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot
 
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
-        return index < 5 && matchesFilter(stack);
+        // Allow manual placement of any item in storage slots
+        return index < 5;
     }
 
     @Override

@@ -60,14 +60,8 @@ public class ContainerGoldenHopper extends Container {
                 }
             } else {
                 // Clicked slot is from player inventory
-                // Try to transfer to hopper storage slots (slots 1-5) if item matches filter
-                if (hopperInv.isItemValidForSlot(0, itemstack1)) {
-                    // Try to merge into hopper storage slots first
-                    if (!this.mergeItemStack(itemstack1, 1, 6, false)) {
-                        return ItemStack.EMPTY;
-                    }
-                } else {
-                    // Item doesn't match filter, cannot transfer to hopper
+                // Allow transfer of any item to hopper storage slots (manual placement)
+                if (!this.mergeItemStack(itemstack1, 1, 6, false)) {
                     return ItemStack.EMPTY;
                 }
             }
