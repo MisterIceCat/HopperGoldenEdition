@@ -1,5 +1,7 @@
 package mod.mistericecat.hoppergoldenedition.tileentity;
 
+import net.minecraft.block.BlockHopper;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -7,12 +9,14 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityLockableLoot;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
 
@@ -35,7 +39,7 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot
             if (transferCooldown <= 0) {
                 boolean moved = false;
 
-                if (!isEmpty()) moved = pushItemsDown();
+                if (!isEmpty()) moved = pushItems();
                 if (!isFull()) moved |= pullItems();
 
                 if (moved) {
@@ -51,8 +55,14 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot
         return filter.isEmpty() || ItemStack.areItemsEqual(filter, stack);
     }
 
-    private boolean pushItemsDown() {
-        TileEntity te = world.getTileEntity(pos.down());
+    private boolean pushItems() {
+        IBlockState state = world.getBlockState(pos);
+        if (!(state.getBlock() instanceof BlockHopper)) return false;
+        
+        EnumFacing facing = state.getValue(BlockHopper.FACING);
+        BlockPos targetPos = pos.offset(facing);
+        TileEntity te = world.getTileEntity(targetPos);
+        
         if (!(te instanceof IInventory)) return false;
 
         IInventory target = (IInventory) te;
@@ -67,7 +77,7 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot
             ItemStack toMove = stack.copy();
             toMove.setCount(1);
 
-            if (insertIntoInventory(target, toMove)) {
+            if (insertIntoInventory(target, toMove, facing)) {
                 stack.shrink(1);
                 if (stack.getCount() <= 0) {
                     inventory.set(i, ItemStack.EMPTY);
@@ -97,7 +107,7 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot
             ItemStack toMove = stack.copy();
             toMove.setCount(1);
 
-            if (insertIntoInventory(this, toMove)) {
+            if (insertIntoInventory(this, toMove, EnumFacing.DOWN)) {
                 stack.shrink(1);
                 if (stack.getCount() <= 0) entity.setDead();
                 return true;
@@ -114,7 +124,7 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot
             ItemStack toMove = stack.copy();
             toMove.setCount(1);
 
-            if (insertIntoInventory(this, toMove)) {
+            if (insertIntoInventory(this, toMove, EnumFacing.DOWN)) {
                 stack.shrink(1);
                 if (stack.getCount() <= 0) {
                     inv.setInventorySlotContents(i, ItemStack.EMPTY);
@@ -126,20 +136,61 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot
         return false;
     }
 
-    private boolean insertIntoInventory(IInventory inv, ItemStack stack) {
-        for (int i = 0; i < inv.getSizeInventory(); i++) {
-            ItemStack slot = inv.getStackInSlot(i);
-
-            if (slot.isEmpty()) {
-                inv.setInventorySlotContents(i, stack);
-                return true;
+    private boolean insertIntoInventory(IInventory inv, ItemStack stack, EnumFacing direction) {
+        // Handle ISidedInventory properly
+        if (inv instanceof ISidedInventory) {
+            ISidedInventory sidedInv = (ISidedInventory) inv;
+            // Get slots accessible from the given direction
+            // For items coming from a direction, we need the opposite face on the target
+            EnumFacing targetFace = direction.getOpposite();
+            int[] slots = sidedInv.getSlotsForFace(targetFace);
+            
+            // For hopper-to-hopper transfers, bypass canInsertItem filter check
+            // since we already validated against source hopper's filter
+            boolean isHopperToHopper = (inv instanceof TileEntityGoldenHopper);
+            
+            // First try to merge with existing stacks
+            for (int slotIndex : slots) {
+                // Skip filter check for hopper-to-hopper transfers
+                if (!isHopperToHopper && !sidedInv.canInsertItem(slotIndex, stack, targetFace)) continue;
+                
+                ItemStack slot = inv.getStackInSlot(slotIndex);
+                if (!slot.isEmpty() 
+                        && ItemStack.areItemsEqual(slot, stack)
+                        && ItemStack.areItemStackTagsEqual(slot, stack)
+                        && slot.getCount() < slot.getMaxStackSize()) {
+                    slot.grow(1);
+                    return true;
+                }
             }
+            
+            // Then try empty slots
+            for (int slotIndex : slots) {
+                // Skip filter check for hopper-to-hopper transfers
+                if (!isHopperToHopper && !sidedInv.canInsertItem(slotIndex, stack, targetFace)) continue;
+                
+                ItemStack slot = inv.getStackInSlot(slotIndex);
+                if (slot.isEmpty()) {
+                    inv.setInventorySlotContents(slotIndex, stack);
+                    return true;
+                }
+            }
+        } else {
+            // Regular inventory - try all slots
+            for (int i = 0; i < inv.getSizeInventory(); i++) {
+                ItemStack slot = inv.getStackInSlot(i);
 
-            if (ItemStack.areItemsEqual(slot, stack)
-                    && ItemStack.areItemStackTagsEqual(slot, stack)
-                    && slot.getCount() < slot.getMaxStackSize()) {
-                slot.grow(1);
-                return true;
+                if (slot.isEmpty()) {
+                    inv.setInventorySlotContents(i, stack);
+                    return true;
+                }
+
+                if (ItemStack.areItemsEqual(slot, stack)
+                        && ItemStack.areItemStackTagsEqual(slot, stack)
+                        && slot.getCount() < slot.getMaxStackSize()) {
+                    slot.grow(1);
+                    return true;
+                }
             }
         }
         return false;
@@ -257,5 +308,31 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot
     @Override
     public String getGuiID() {
         return "hoppergoldenedition:golden_hopper";
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound compound) {
+        super.readFromNBT(compound);
+        this.inventory = NonNullList.withSize(this.getSizeInventory(), ItemStack.EMPTY);
+        
+        if (!this.checkLootAndRead(compound)) {
+            net.minecraft.inventory.ItemStackHelper.loadAllItems(compound, this.inventory);
+        }
+        
+        if (compound.hasKey("TransferCooldown", 99)) {
+            this.transferCooldown = compound.getInteger("TransferCooldown");
+        }
+    }
+
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+        super.writeToNBT(compound);
+        
+        if (!this.checkLootAndWrite(compound)) {
+            net.minecraft.inventory.ItemStackHelper.saveAllItems(compound, this.inventory);
+        }
+        
+        compound.setInteger("TransferCooldown", this.transferCooldown);
+        return compound;
     }
 }
