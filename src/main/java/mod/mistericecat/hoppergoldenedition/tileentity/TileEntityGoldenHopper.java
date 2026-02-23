@@ -29,7 +29,7 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 public class TileEntityGoldenHopper extends TileEntityLockableLoot implements ISidedInventory, ITickable {
 
     public static final int FILTER_SLOT = 5;
-    private static final int[] STORAGE_SLOTS = new int[]{0,1,2,3,4};
+    private static final int[] STORAGE_SLOTS = new int[]{0, 1, 2, 3, 4};
 
     private NonNullList<ItemStack> inventory = NonNullList.withSize(6, ItemStack.EMPTY);
     private int transferCooldown = 0;
@@ -202,9 +202,13 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot implements IS
         return false;
     }
 
-    @Override public int getSizeInventory() { return 6; }
+    @Override
+    public int getSizeInventory() {
+        return 6;
+    }
 
-    @Override public boolean isEmpty() {
+    @Override
+    public boolean isEmpty() {
         for (int i = 0; i < 5; i++)
             if (!inventory.get(i).isEmpty()) return false;
         return true;
@@ -218,48 +222,81 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot implements IS
         return true;
     }
 
-    @Override public ItemStack getStackInSlot(int index) { return inventory.get(index); }
+    @Override
+    public ItemStack getStackInSlot(int index) {
+        return inventory.get(index);
+    }
 
-    @Override public void setInventorySlotContents(int index, ItemStack stack) {
+    @Override
+    public void setInventorySlotContents(int index, ItemStack stack) {
         inventory.set(index, stack);
         markDirty();
     }
 
-    @Override public void clear() {
+    @Override
+    public void clear() {
         for (int i = 0; i < inventory.size(); i++)
             inventory.set(i, ItemStack.EMPTY);
     }
 
-    @Override protected NonNullList<ItemStack> getItems() { return inventory; }
-
-    @Override public boolean isItemValidForSlot(int index, ItemStack stack) { return index < 5; }
-
-    @Override public int[] getSlotsForFace(EnumFacing side) { return STORAGE_SLOTS; }
-
-    @Override public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction) {
-        return index < 5 && matchesFilter(stack);
+    @Override
+    protected NonNullList<ItemStack> getItems() {
+        return inventory;
     }
 
-    @Override public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
+    @Override
+    public boolean isItemValidForSlot(int index, ItemStack stack) {
         return index < 5;
     }
 
-    @Override public int getField(int id) { return 0; }
+    @Override
+    public int[] getSlotsForFace(EnumFacing side) {
+        return STORAGE_SLOTS;
+    }
 
-    @Override public void setField(int id, int value) {}
+    @Override
+    public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction) {
+        return index < 5 && matchesFilter(stack);
+    }
 
-    @Override public int getFieldCount() { return 0; }
+    @Override
+    public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
+        return index < 5;
+    }
 
-    @Override public String getName() { return "container.golden_hopper"; }
+    @Override
+    public int getField(int id) {
+        return 0;
+    }
 
-    @Override public boolean hasCustomName() { return false; }
+    @Override
+    public void setField(int id, int value) {
+    }
 
-    @Override public int getInventoryStackLimit() { return 64; }
+    @Override
+    public int getFieldCount() {
+        return 0;
+    }
+
+    @Override
+    public String getName() {
+        return "container.golden_hopper";
+    }
+
+    @Override
+    public boolean hasCustomName() {
+        return false;
+    }
+
+    @Override
+    public int getInventoryStackLimit() {
+        return 64;
+    }
 
     @Override
     public boolean isUsableByPlayer(EntityPlayer player) {
         return world.getTileEntity(pos) == this &&
-                player.getDistanceSq(pos.getX()+0.5D,pos.getY()+0.5D,pos.getZ()+0.5D) <= 64.0D;
+                player.getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
     }
 
     @Override
@@ -267,7 +304,10 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot implements IS
         return new ContainerGoldenHopper(playerInventory, this);
     }
 
-    @Override public String getGuiID() { return "hoppergoldenedition:golden_hopper"; }
+    @Override
+    public String getGuiID() {
+        return "hoppergoldenedition:golden_hopper";
+    }
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
@@ -286,5 +326,67 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot implements IS
             net.minecraft.inventory.ItemStackHelper.saveAllItems(compound, this.inventory);
         compound.setInteger("TransferCooldown", this.transferCooldown);
         return compound;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, EnumFacing facing) {
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+            return (T) new IItemHandler() {
+
+                @Override
+                public int getSlots() {
+                    return 5;
+                }
+
+                @Override
+                public ItemStack getStackInSlot(int slot) {
+                    return slot >= 0 && slot < 5 ? inventory.get(slot) : ItemStack.EMPTY;
+                }
+
+                @Override
+                public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+                    if (slot < 0 || slot >= 5) return stack;
+                    if (!matchesFilter(stack)) return stack;
+                    ItemStack existing = inventory.get(slot);
+                    if (existing.isEmpty()) {
+                        if (!simulate) inventory.set(slot, stack.copy());
+                        return ItemStack.EMPTY;
+                    }
+                    if (ItemStack.areItemsEqual(existing, stack)
+                            && ItemStack.areItemStackTagsEqual(existing, stack)
+                            && existing.getCount() < existing.getMaxStackSize()) {
+                        int space = existing.getMaxStackSize() - existing.getCount();
+                        int toAdd = Math.min(space, stack.getCount());
+                        if (!simulate) existing.grow(toAdd);
+                        ItemStack remaining = stack.copy();
+                        remaining.shrink(toAdd);
+                        return remaining.getCount() <= 0 ? ItemStack.EMPTY : remaining;
+                    }
+                    return stack;
+                }
+
+                @Override
+                public ItemStack extractItem(int slot, int amount, boolean simulate) {
+                    if (slot < 0 || slot >= 5) return ItemStack.EMPTY;
+                    ItemStack existing = inventory.get(slot);
+                    if (existing.isEmpty()) return ItemStack.EMPTY;
+                    if (!matchesFilter(existing)) return ItemStack.EMPTY;
+                    int toExtract = Math.min(amount, existing.getCount());
+                    ItemStack extracted = existing.copy();
+                    extracted.setCount(toExtract);
+                    if (!simulate) {
+                        existing.shrink(toExtract);
+                        if (existing.getCount() <= 0) inventory.set(slot, ItemStack.EMPTY);
+                    }
+                    return extracted;
+                }
+
+                @Override
+                public int getSlotLimit(int slot) {
+                    return 64;
+                }
+            };
+        }
+        return super.getCapability(capability, facing);
     }
 }
