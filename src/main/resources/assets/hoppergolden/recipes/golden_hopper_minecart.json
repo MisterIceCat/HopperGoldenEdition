@@ -2,14 +2,14 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "hoppergolden:golden_hopper"
+      "item": "hoppergoldenedition:golden_hopper"
     },
     {
       "item": "minecraft:minecart"
     }
   ],
   "result": {
-    "item": "hoppergolden:golden_hopper_minecart",
+    "item": "hoppergoldenedition:golden_hopper_minecart",
     "count": 1
   }
 }
