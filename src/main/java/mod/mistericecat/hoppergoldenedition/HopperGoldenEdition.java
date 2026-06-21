@@ -1,6 +1,5 @@
 package mod.mistericecat.hoppergoldenedition;
 
-import mod.mistericecat.hoppergolden.Tags;
 import mod.mistericecat.hoppergoldenedition.handler.GuiHandler;
 import mod.mistericecat.hoppergoldenedition.init.RegistrationHandler;
 import mod.mistericecat.hoppergoldenedition.tileentity.TileEntityGoldenHopper;
@@ -17,7 +16,7 @@ public class HopperGoldenEdition {
 
     public static final String MOD_ID = "hoppergoldenedition";
     public static final String NAME = "Hopper Golden Edition";
-    public static final String VERSION = "1.0.3";
+    public static final String VERSION = "1.0.5";
     public static final String ACCEPTED_VERSIONS = "[1.12.2]";
 
     public static final Logger LOGGER = LogManager.getLogger(NAME);
