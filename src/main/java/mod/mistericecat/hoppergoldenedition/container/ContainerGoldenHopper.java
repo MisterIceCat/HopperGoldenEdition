@@ -46,21 +46,11 @@ public class ContainerGoldenHopper extends Container {
             ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
 
-            // Slot layout:
-            // 0: Filter slot (hopperInv slot 5)
-            // 1-5: Storage slots (hopperInv slots 0-4)
-            // 6-32: Player main inventory (27 slots: 3 rows × 9)
-            // 33-41: Player hotbar (9 slots)
-
             if (index < 6) {
-                // Clicked slot is from hopper inventory (filter or storage)
-                // Transfer to player inventory
                 if (!this.mergeItemStack(itemstack1, 6, 42, true)) {
                     return ItemStack.EMPTY;
                 }
             } else {
-                // Clicked slot is from player inventory
-                // Allow transfer of any item to hopper storage slots (manual placement)
                 if (!this.mergeItemStack(itemstack1, 1, 6, false)) {
                     return ItemStack.EMPTY;
                 }
