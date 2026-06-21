@@ -112,6 +112,10 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot implements IS
     private boolean pullItems() {
         TileEntity te = world.getTileEntity(pos.up());
 
+        if (te instanceof TileEntityGoldenHopper) {
+            return false;
+        }
+
         if (te != null) {
             if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.DOWN)) {
                 IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.DOWN);
@@ -119,7 +123,9 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot implements IS
                     for (int i = 0; i < handler.getSlots(); i++) {
                         ItemStack stack = handler.getStackInSlot(i);
                         if (stack.isEmpty() || !matchesFilter(stack)) continue;
+
                         ItemStack extracted = handler.extractItem(i, 1, false);
+
                         if (!extracted.isEmpty()) {
                             if (ItemHandlerHelper.insertItemStacked(new InvWrapper(this), extracted, false).isEmpty()) {
                                 return true;
@@ -138,8 +144,10 @@ public class TileEntityGoldenHopper extends TileEntityLockableLoot implements IS
         for (EntityItem entity : items) {
             ItemStack stack = entity.getItem();
             if (!matchesFilter(stack)) continue;
+
             ItemStack toMove = stack.copy();
             toMove.setCount(1);
+
             if (ItemHandlerHelper.insertItemStacked(new InvWrapper(this), toMove, false).isEmpty()) {
                 stack.shrink(1);
                 if (stack.getCount() <= 0) entity.setDead();
